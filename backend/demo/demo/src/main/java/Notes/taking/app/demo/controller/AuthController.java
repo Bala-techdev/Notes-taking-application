@@ -11,8 +11,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import Notes.taking.app.demo.dto.AuthRequestDto;
 import Notes.taking.app.demo.dto.AuthResponseDto;
+import Notes.taking.app.demo.dto.LoginRequestDto;
+import Notes.taking.app.demo.dto.RegisterRequestDto;
 import Notes.taking.app.demo.dto.UserResponseDto;
 import Notes.taking.app.demo.entity.User;
 import Notes.taking.app.demo.security.JwtUtil;
@@ -30,7 +31,7 @@ public class AuthController {
     private final JwtUtil jwtUtil;
 
     @PostMapping("/register")
-    public ResponseEntity<UserResponseDto> register(@Valid @RequestBody AuthRequestDto requestDto) {
+    public ResponseEntity<UserResponseDto> register(@Valid @RequestBody RegisterRequestDto requestDto) {
         User user = User.builder()
                 .username(requestDto.getUsername())
                 .email(requestDto.getEmail())
@@ -46,12 +47,12 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponseDto> login(@Valid @RequestBody AuthRequestDto requestDto) {
-        Authentication authentication = authenticationManager.authenticate(
+    public ResponseEntity<AuthResponseDto> login(@Valid @RequestBody LoginRequestDto requestDto) {
+        final Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(requestDto.getEmail(), requestDto.getPassword()));
 
-        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-        String token = jwtUtil.generateToken(userDetails.getUsername());
+        final UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        final String token = jwtUtil.generateToken(userDetails.getUsername());
 
         return ResponseEntity.ok(AuthResponseDto.builder()
                 .token(token)
