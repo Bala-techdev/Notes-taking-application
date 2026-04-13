@@ -38,6 +38,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
+
+        
+
         String token = authorizationHeader.substring(7);
 
         try {
