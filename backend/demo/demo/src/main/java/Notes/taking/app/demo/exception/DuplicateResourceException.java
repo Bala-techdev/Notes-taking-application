@@ -1,0 +1,8 @@
+package Notes.taking.app.demo.exception;
+
+public class DuplicateResourceException extends RuntimeException {
+
+    public DuplicateResourceException(String message) {
+        super(message);
+    }
+}
