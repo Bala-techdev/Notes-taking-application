@@ -7,11 +7,11 @@ import Notes.taking.app.demo.dto.NoteResponseDto;
 
 public interface NoteService {
 
-    NoteResponseDto createNote(String email, NoteRequestDto requestDto);
+    NoteResponseDto createNote(NoteRequestDto requestDto);
 
-    NoteResponseDto updateNote(String email, Long noteId, NoteRequestDto requestDto);
+    NoteResponseDto updateNote(Long noteId, NoteRequestDto requestDto);
 
-    void deleteNote(String email, Long noteId);
+    void deleteNote(Long noteId);
 
-    List<NoteResponseDto> getNotesByUser(String email);
+    List<NoteResponseDto> getNotesByUser();
 }

@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,26 +27,24 @@ public class NoteController {
     private final NoteService noteService;
 
     @PostMapping
-    public ResponseEntity<NoteResponseDto> createNote(Authentication authentication,
-                                                      @Valid @RequestBody NoteRequestDto requestDto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(noteService.createNote(authentication.getName(), requestDto));
+    public ResponseEntity<NoteResponseDto> createNote(@Valid @RequestBody NoteRequestDto requestDto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(noteService.createNote(requestDto));
     }
 
     @GetMapping
-    public ResponseEntity<List<NoteResponseDto>> getNotesByUser(Authentication authentication) {
-        return ResponseEntity.ok(noteService.getNotesByUser(authentication.getName()));
+    public ResponseEntity<List<NoteResponseDto>> getNotesByUser() {
+        return ResponseEntity.ok(noteService.getNotesByUser());
     }
 
     @PutMapping("/{noteId}")
-    public ResponseEntity<NoteResponseDto> updateNote(Authentication authentication,
-                                                      @PathVariable Long noteId,
+    public ResponseEntity<NoteResponseDto> updateNote(@PathVariable Long noteId,
                                                       @Valid @RequestBody NoteRequestDto requestDto) {
-        return ResponseEntity.ok(noteService.updateNote(authentication.getName(), noteId, requestDto));
+        return ResponseEntity.ok(noteService.updateNote(noteId, requestDto));
     }
 
     @DeleteMapping("/{noteId}")
-    public ResponseEntity<Void> deleteNote(Authentication authentication, @PathVariable Long noteId) {
-        noteService.deleteNote(authentication.getName(), noteId);
+    public ResponseEntity<Void> deleteNote(@PathVariable Long noteId) {
+        noteService.deleteNote(noteId);
         return ResponseEntity.noContent().build();
     }
 }

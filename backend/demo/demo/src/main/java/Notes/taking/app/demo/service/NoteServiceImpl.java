@@ -2,6 +2,9 @@ package Notes.taking.app.demo.service;
 
 import java.util.List;
 
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,8 +26,8 @@ public class NoteServiceImpl implements NoteService {
     private final UserRepository userRepository;
 
     @Override
-    public NoteResponseDto createNote(String email, NoteRequestDto requestDto) {
-        User user = getUserByEmail(email);
+    public NoteResponseDto createNote(NoteRequestDto requestDto) {
+        User user = getCurrentUser();
 
         Note note = Note.builder()
                 .title(requestDto.getTitle())
@@ -38,8 +41,10 @@ public class NoteServiceImpl implements NoteService {
     }
 
     @Override
-    public NoteResponseDto updateNote(String email, Long noteId, NoteRequestDto requestDto) {
-        Note note = noteRepository.findByIdAndUserEmail(noteId, email)
+    public NoteResponseDto updateNote(Long noteId, NoteRequestDto requestDto) {
+        User user = getCurrentUser();
+
+        Note note = noteRepository.findByIdAndUserId(noteId, user.getId())
             .orElseThrow(() -> new ResourceNotFoundException("Note not found with id: " + noteId));
 
         note.setTitle(requestDto.getTitle());
@@ -51,22 +56,33 @@ public class NoteServiceImpl implements NoteService {
     }
 
     @Override
-    public void deleteNote(String email, Long noteId) {
-        Note note = noteRepository.findByIdAndUserEmail(noteId, email)
+    public void deleteNote(Long noteId) {
+        User user = getCurrentUser();
+
+        Note note = noteRepository.findByIdAndUserId(noteId, user.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Note not found with id: " + noteId));
         noteRepository.delete(note);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<NoteResponseDto> getNotesByUser(String email) {
-        return noteRepository.findByUserEmailOrderByUpdatedAtDesc(email)
+    public List<NoteResponseDto> getNotesByUser() {
+        User user = getCurrentUser();
+
+        return noteRepository.findByUserIdOrderByUpdatedAtDesc(user.getId())
                 .stream()
                 .map(this::mapToResponse)
                 .toList();
     }
 
-    private User getUserByEmail(String email) {
+    private User getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()
+                || authentication instanceof AnonymousAuthenticationToken) {
+            throw new ResourceNotFoundException("Authenticated user not found");
+        }
+
+        String email = authentication.getName();
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
     }

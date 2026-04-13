@@ -11,7 +11,7 @@ import Notes.taking.app.demo.entity.Note;
 @Repository
 public interface NoteRepository extends JpaRepository<Note, Long> {
 
-	List<Note> findByUserEmailOrderByUpdatedAtDesc(String email);
+	List<Note> findByUserIdOrderByUpdatedAtDesc(Long userId);
 
-	Optional<Note> findByIdAndUserEmail(Long id, String email);
+	Optional<Note> findByIdAndUserId(Long id, Long userId);
 }
