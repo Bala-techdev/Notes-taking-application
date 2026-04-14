@@ -1,10 +1,11 @@
 package Notes.taking.app.demo.service;
 
-import Notes.taking.app.demo.entity.User;
+import Notes.taking.app.demo.dto.UserRequest;
+import Notes.taking.app.demo.dto.UserResponse;
 
 public interface UserService {
 
-    User registerUser(User user);
+    UserResponse registerUser(UserRequest request);
 
-    User findUserByEmail(String email);
+    UserResponse findUserByEmail(String email);
 }

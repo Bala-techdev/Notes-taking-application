@@ -2,16 +2,16 @@ package Notes.taking.app.demo.service;
 
 import java.util.List;
 
-import Notes.taking.app.demo.dto.NoteRequestDto;
-import Notes.taking.app.demo.dto.NoteResponseDto;
+import Notes.taking.app.demo.dto.NoteRequest;
+import Notes.taking.app.demo.dto.NoteResponse;
 
 public interface NoteService {
 
-    NoteResponseDto createNote(NoteRequestDto requestDto);
+    NoteResponse createNote(NoteRequest request);
 
-    NoteResponseDto updateNote(Long noteId, NoteRequestDto requestDto);
+    NoteResponse updateNote(Long noteId, NoteRequest request);
 
     void deleteNote(Long noteId);
 
-    List<NoteResponseDto> getNotesByUser();
+    List<NoteResponse> getNotesByUser();
 }

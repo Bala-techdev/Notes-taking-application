@@ -1,4 +1,4 @@
-package main.java.Notes.taking.app.demo.dto;
+package Notes.taking.app.demo.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

@@ -8,8 +8,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import Notes.taking.app.demo.dto.NoteRequestDto;
-import Notes.taking.app.demo.dto.NoteResponseDto;
+import Notes.taking.app.demo.dto.NoteRequest;
+import Notes.taking.app.demo.dto.NoteResponse;
 import Notes.taking.app.demo.entity.Note;
 import Notes.taking.app.demo.entity.User;
 import Notes.taking.app.demo.exception.ResourceNotFoundException;
@@ -26,30 +26,25 @@ public class NoteServiceImpl implements NoteService {
     private final UserRepository userRepository;
 
     @Override
-    public NoteResponseDto createNote(NoteRequestDto requestDto) {
+    public NoteResponse createNote(NoteRequest request) {
         User user = getCurrentUser();
 
-        Note note = Note.builder()
-                .title(requestDto.getTitle())
-                .content(requestDto.getContent())
-                .codeSnippet(requestDto.getCodeSnippet())
-                .user(user)
-                .build();
+        Note note = mapToEntity(request, user);
 
         Note saved = noteRepository.save(note);
         return mapToResponse(saved);
     }
 
     @Override
-    public NoteResponseDto updateNote(Long noteId, NoteRequestDto requestDto) {
+    public NoteResponse updateNote(Long noteId, NoteRequest request) {
         User user = getCurrentUser();
 
         Note note = noteRepository.findByIdAndUserId(noteId, user.getId())
             .orElseThrow(() -> new ResourceNotFoundException("Note not found with id: " + noteId));
 
-        note.setTitle(requestDto.getTitle());
-        note.setContent(requestDto.getContent());
-        note.setCodeSnippet(requestDto.getCodeSnippet());
+        note.setTitle(request.getTitle());
+        note.setContent(request.getContent());
+        note.setCodeSnippet(request.getCodeSnippet());
 
         Note updated = noteRepository.save(note);
         return mapToResponse(updated);
@@ -66,7 +61,7 @@ public class NoteServiceImpl implements NoteService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<NoteResponseDto> getNotesByUser() {
+    public List<NoteResponse> getNotesByUser() {
         User user = getCurrentUser();
 
         return noteRepository.findByUserIdOrderByUpdatedAtDesc(user.getId())
@@ -87,8 +82,17 @@ public class NoteServiceImpl implements NoteService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
     }
 
-    private NoteResponseDto mapToResponse(Note note) {
-        return NoteResponseDto.builder()
+    private Note mapToEntity(NoteRequest request, User user) {
+        return Note.builder()
+                .title(request.getTitle())
+                .content(request.getContent())
+                .codeSnippet(request.getCodeSnippet())
+                .user(user)
+                .build();
+    }
+
+    private NoteResponse mapToResponse(Note note) {
+        return NoteResponse.builder()
                 .id(note.getId())
                 .userId(note.getUser().getId())
                 .title(note.getTitle())

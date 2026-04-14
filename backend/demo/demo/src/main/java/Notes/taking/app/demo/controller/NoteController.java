@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import Notes.taking.app.demo.dto.NoteRequestDto;
-import Notes.taking.app.demo.dto.NoteResponseDto;
+import Notes.taking.app.demo.dto.NoteRequest;
+import Notes.taking.app.demo.dto.NoteResponse;
 import Notes.taking.app.demo.service.NoteService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,19 +27,19 @@ public class NoteController {
     private final NoteService noteService;
 
     @PostMapping
-    public ResponseEntity<NoteResponseDto> createNote(@Valid @RequestBody NoteRequestDto requestDto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(noteService.createNote(requestDto));
+    public ResponseEntity<NoteResponse> createNote(@Valid @RequestBody NoteRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(noteService.createNote(request));
     }
 
     @GetMapping
-    public ResponseEntity<List<NoteResponseDto>> getNotesByUser() {
+    public ResponseEntity<List<NoteResponse>> getNotesByUser() {
         return ResponseEntity.ok(noteService.getNotesByUser());
     }
 
     @PutMapping("/{noteId}")
-    public ResponseEntity<NoteResponseDto> updateNote(@PathVariable Long noteId,
-                                                      @Valid @RequestBody NoteRequestDto requestDto) {
-        return ResponseEntity.ok(noteService.updateNote(noteId, requestDto));
+    public ResponseEntity<NoteResponse> updateNote(@PathVariable Long noteId,
+                                                   @Valid @RequestBody NoteRequest request) {
+        return ResponseEntity.ok(noteService.updateNote(noteId, request));
     }
 
     @DeleteMapping("/{noteId}")

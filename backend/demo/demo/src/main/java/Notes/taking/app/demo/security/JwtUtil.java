@@ -8,6 +8,7 @@ import javax.crypto.SecretKey;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
@@ -23,6 +24,10 @@ public class JwtUtil {
 
     public JwtUtil(@Value("${app.jwt.secret}") String secret,
                    @Value("${app.jwt.expiration-ms}") long expirationMs) {
+        if (!StringUtils.hasText(secret)) {
+            throw new IllegalStateException("Missing app.jwt.secret. Set JWT_SECRET environment variable.");
+        }
+
         byte[] keyBytes = isBase64(secret)
                 ? Decoders.BASE64.decode(secret)
                 : secret.getBytes(StandardCharsets.UTF_8);

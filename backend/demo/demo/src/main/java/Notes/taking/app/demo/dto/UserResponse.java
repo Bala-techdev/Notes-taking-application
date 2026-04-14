@@ -1,7 +1,5 @@
 package Notes.taking.app.demo.dto;
 
-import java.time.LocalDateTime;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,13 +11,9 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class NoteResponseDto {
+public class UserResponse {
 
     private Long id;
-    private Long userId;
-    private String title;
-    private String content;
-    private String codeSnippet;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
+    private String username;
+    private String email;
 }

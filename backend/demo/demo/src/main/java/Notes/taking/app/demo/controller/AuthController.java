@@ -13,9 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import Notes.taking.app.demo.dto.AuthResponseDto;
 import Notes.taking.app.demo.dto.LoginRequestDto;
-import Notes.taking.app.demo.dto.RegisterRequestDto;
-import Notes.taking.app.demo.dto.UserResponseDto;
-import Notes.taking.app.demo.entity.User;
+import Notes.taking.app.demo.dto.UserRequest;
+import Notes.taking.app.demo.dto.UserResponse;
 import Notes.taking.app.demo.security.JwtUtil;
 import Notes.taking.app.demo.service.UserService;
 import jakarta.validation.Valid;
@@ -31,19 +30,8 @@ public class AuthController {
     private final JwtUtil jwtUtil;
 
     @PostMapping("/register")
-    public ResponseEntity<UserResponseDto> register(@Valid @RequestBody RegisterRequestDto requestDto) {
-        User user = User.builder()
-                .username(requestDto.getUsername())
-                .email(requestDto.getEmail())
-                .password(requestDto.getPassword())
-                .build();
-
-        User savedUser = userService.registerUser(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(UserResponseDto.builder()
-                .id(savedUser.getId())
-                .username(savedUser.getUsername())
-                .email(savedUser.getEmail())
-                .build());
+        public ResponseEntity<UserResponse> register(@Valid @RequestBody UserRequest request) {
+                return ResponseEntity.status(HttpStatus.CREATED).body(userService.registerUser(request));
     }
 
     @PostMapping("/login")

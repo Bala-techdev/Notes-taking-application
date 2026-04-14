@@ -31,3 +31,15 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Secrets / local env ###
+.env
+.env.*
+*.key
+*.pem
+*.p12
+*.jks
+application-local.properties
+application-dev.properties
+src/main/resources/application-local.properties
+src/main/resources/application-dev.properties
