@@ -1,14 +1,19 @@
 import axios from 'axios'
+import { clearSession, getCurrentUser, saveSession } from './authService'
 
-const AUTH_KEY = 'notes-app-auth'
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
+  timeout: 15000,
+  headers: {
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
+  },
 })
 
 apiClient.interceptors.request.use((config) => {
-  const session = JSON.parse(localStorage.getItem(AUTH_KEY) || 'null')
+  const session = getCurrentUser()
   const token = session?.token
   const tokenType = session?.tokenType || 'Bearer'
 
@@ -19,9 +24,50 @@ apiClient.interceptors.request.use((config) => {
   return config
 })
 
-function normalizeApiError(error, fallbackMessage) {
-  const message = error?.response?.data?.message || fallbackMessage
-  throw new Error(message)
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const status = error?.response?.status
+    const requestUrl = error?.config?.url || ''
+
+    // Clear stale JWT if backend rejects protected requests.
+    if (status === 401 && !requestUrl.startsWith('/api/auth/')) {
+      clearSession()
+    }
+
+    return Promise.reject(error)
+  }
+)
+
+function resolveApiErrorMessage(error, fallbackMessage) {
+  if (error?.response?.data) {
+    const { data } = error.response
+    if (typeof data.message === 'string' && data.message.trim()) {
+      return data.message
+    }
+
+    const fieldErrors = data.fieldErrors
+    if (fieldErrors && typeof fieldErrors === 'object') {
+      const firstFieldMessage = Object.values(fieldErrors).find((value) => typeof value === 'string' && value.trim())
+      if (firstFieldMessage) {
+        return firstFieldMessage
+      }
+    }
+  }
+
+  if (error?.code === 'ECONNABORTED') {
+    return 'Request timed out. Please try again.'
+  }
+
+  if (!error?.response) {
+    return 'Unable to connect to server. Check backend URL and CORS configuration.'
+  }
+
+  return fallbackMessage
+}
+
+function throwApiError(error, fallbackMessage) {
+  throw new Error(resolveApiErrorMessage(error, fallbackMessage))
 }
 
 export async function login({ email, password }) {
@@ -38,10 +84,10 @@ export async function login({ email, password }) {
       tokenType: data.tokenType || 'Bearer',
     }
 
-    localStorage.setItem(AUTH_KEY, JSON.stringify(session))
+    saveSession(session)
     return data
   } catch (error) {
-    normalizeApiError(error, 'Invalid email or password.')
+    throwApiError(error, 'Invalid email or password.')
   }
 }
 
@@ -54,7 +100,7 @@ export async function register({ username, email, password }) {
     })
     return data
   } catch (error) {
-    normalizeApiError(error, 'Registration failed.')
+    throwApiError(error, 'Registration failed.')
   }
 }
 
@@ -63,7 +109,7 @@ export async function getNotes() {
     const { data } = await apiClient.get('/api/notes')
     return data
   } catch (error) {
-    normalizeApiError(error, 'Failed to fetch notes.')
+    throwApiError(error, 'Failed to fetch notes.')
   }
 }
 
@@ -72,7 +118,7 @@ export async function createNote(noteInput) {
     const { data } = await apiClient.post('/api/notes', noteInput)
     return data
   } catch (error) {
-    normalizeApiError(error, 'Failed to create note.')
+    throwApiError(error, 'Failed to create note.')
   }
 }
 
@@ -81,7 +127,7 @@ export async function updateNote(id, noteInput) {
     const { data } = await apiClient.put(`/api/notes/${id}`, noteInput)
     return data
   } catch (error) {
-    normalizeApiError(error, 'Failed to update note.')
+    throwApiError(error, 'Failed to update note.')
   }
 }
 
@@ -89,7 +135,7 @@ export async function deleteNote(id) {
   try {
     await apiClient.delete(`/api/notes/${id}`)
   } catch (error) {
-    normalizeApiError(error, 'Failed to delete note.')
+    throwApiError(error, 'Failed to delete note.')
   }
 }
 

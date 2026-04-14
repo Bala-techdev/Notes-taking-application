@@ -1,5 +1,15 @@
 const AUTH_KEY = 'notes-app-auth'
 
+export { AUTH_KEY }
+
+export function saveSession(session) {
+  localStorage.setItem(AUTH_KEY, JSON.stringify(session))
+}
+
+export function clearSession() {
+  localStorage.removeItem(AUTH_KEY)
+}
+
 export function getCurrentUser() {
   try {
     return JSON.parse(localStorage.getItem(AUTH_KEY) || 'null')
@@ -19,5 +29,5 @@ export function isAuthenticated() {
 }
 
 export function logout() {
-  localStorage.removeItem(AUTH_KEY)
+  clearSession()
 }
