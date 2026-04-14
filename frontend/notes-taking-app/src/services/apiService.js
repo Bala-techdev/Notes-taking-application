@@ -1,7 +1,8 @@
 import axios from 'axios'
 import { clearSession, getCurrentUser, saveSession } from './authService'
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || (import.meta.env.DEV ? '' : 'http://localhost:8080')
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -40,6 +41,8 @@ apiClient.interceptors.response.use(
 )
 
 function resolveApiErrorMessage(error, fallbackMessage) {
+  const status = error?.response?.status
+
   if (error?.response?.data) {
     const { data } = error.response
     if (typeof data.message === 'string' && data.message.trim()) {
@@ -53,6 +56,14 @@ function resolveApiErrorMessage(error, fallbackMessage) {
         return firstFieldMessage
       }
     }
+  }
+
+  if (status === 401) {
+    return 'Session expired or unauthorized. Please login again.'
+  }
+
+  if (status === 403) {
+    return 'Access denied. You do not have permission for this action.'
   }
 
   if (error?.code === 'ECONNABORTED') {
