@@ -58,6 +58,10 @@ function AppLayout() {
       <main className="content-shell">
         <Outlet />
       </main>
+
+      <footer className="app-footer" aria-label="Application footer">
+        <p>Bala-techdev</p>
+      </footer>
     </div>
   )
 }
