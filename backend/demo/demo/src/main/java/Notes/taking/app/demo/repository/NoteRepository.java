@@ -14,6 +14,8 @@ public interface NoteRepository extends JpaRepository<Note, Long>, JpaSpecificat
 
 	List<Note> findByUserIdOrderByUpdatedAtDesc(Long userId);
 
+	long countByUserId(Long userId);
+
 	Optional<Note> findByIdAndUserId(Long id, Long userId);
 }
 

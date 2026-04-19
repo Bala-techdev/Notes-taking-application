@@ -10,6 +10,17 @@ export function clearSession() {
   localStorage.removeItem(AUTH_KEY)
 }
 
+export function updateSession(updater) {
+  const current = getCurrentUser()
+  if (!current) {
+    return null
+  }
+
+  const next = typeof updater === 'function' ? updater(current) : { ...current, ...updater }
+  saveSession(next)
+  return next
+}
+
 export function getCurrentUser() {
   try {
     return JSON.parse(localStorage.getItem(AUTH_KEY) || 'null')

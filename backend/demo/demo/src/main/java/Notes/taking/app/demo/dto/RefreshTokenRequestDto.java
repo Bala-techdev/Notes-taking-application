@@ -1,5 +1,6 @@
 package notes.taking.app.demo.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,12 +12,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class AuthResponseDto {
+public class RefreshTokenRequestDto {
 
-    private String token;
-    private String tokenType;
+    @NotBlank(message = "Refresh token is required")
     private String refreshToken;
-    private long accessTokenExpiresInMs;
-    private long refreshTokenExpiresInMs;
 }
-

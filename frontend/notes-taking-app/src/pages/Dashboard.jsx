@@ -4,33 +4,11 @@ import { Link } from 'react-router-dom'
 import { getCurrentUser } from '../services/authService'
 import { deleteNote, getNotes, updateNoteFavorite, updateNotePinned } from '../services/apiService'
 import LoadingSpinner from '../components/LoadingSpinner'
-
-function StarIcon({ filled = false }) {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" width="18" height="18">
-      <path
-        d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"
-        fill={filled ? 'currentColor' : 'none'}
-        stroke="currentColor"
-        strokeWidth="1.8"
-      />
-    </svg>
-  )
-}
-
-function PinIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" width="18" height="18">
-      <path
-        d="M14 3l7 7-2 2-2-2-3 3v4l-2 2v-6l-3-3-2 2-2-2 7-7z"
-        fill="currentColor"
-      />
-    </svg>
-  )
-}
+import NoteCard from '../components/NoteCard'
 
 function Dashboard() {
   const [currentUser] = useState(() => getCurrentUser())
+  const [allNotes, setAllNotes] = useState([])
   const [notes, setNotes] = useState([])
   const [searchTerm, setSearchTerm] = useState('')
   const [sortOrder, setSortOrder] = useState('latest')
@@ -65,7 +43,37 @@ function Dashboard() {
     return () => window.clearTimeout(debounceTimer)
   }, [currentUser, searchTerm, sortOrder, selectedTags])
 
-  const availableTags = [...new Set(notes.flatMap((note) => note.tags || []))]
+  useEffect(() => {
+    const fetchAllNotes = async () => {
+      if (!currentUser) {
+        return
+      }
+
+      try {
+        const data = await getNotes({ sort: 'latest' })
+        setAllNotes(data)
+      } catch {
+        // Keep the main list behavior unchanged when stats fetch fails.
+      }
+    }
+
+    fetchAllNotes()
+  }, [currentUser])
+
+  const availableTags = [...new Set(allNotes.flatMap((note) => note.tags || []))]
+
+  const totalNotesCount = allNotes.length
+  const pinnedNotesCount = allNotes.filter((note) => note.pinned).length
+  const favoriteNotesCount = allNotes.filter((note) => note.favorite).length
+
+  const recentNotes = [...allNotes]
+    .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+    .slice(0, 5)
+
+  const favoriteNotes = [...allNotes]
+    .filter((note) => note.favorite)
+    .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+    .slice(0, 5)
 
   const sortNotesForView = (items, currentSort) => {
     const factor = currentSort === 'oldest' ? 1 : -1
@@ -86,29 +94,18 @@ function Dashboard() {
     try {
       await deleteNote(noteId)
       setNotes((current) => current.filter((note) => note.id !== noteId))
+      setAllNotes((current) => current.filter((note) => note.id !== noteId))
     } catch (error) {
       setError(error.message)
     }
   }
 
-  const toggleTag = (tag) => {
-    setSelectedTags((current) =>
-      current.includes(tag) ? current.filter((value) => value !== tag) : [...current, tag]
-    )
-  }
-
-  const clearFilters = () => {
-    setSearchTerm('')
-    setSortOrder('latest')
-    setSelectedTags([])
-  }
-
   const replaceNoteInList = (updatedNote) => {
     setNotes((current) =>
-      sortNotesForView(
-        current.map((note) => (note.id === updatedNote.id ? updatedNote : note)),
-        sortOrder
-      )
+      current.map((note) => (note.id === updatedNote.id ? updatedNote : note))
+    )
+    setAllNotes((current) =>
+      current.map((note) => (note.id === updatedNote.id ? updatedNote : note))
     )
   }
 
@@ -130,8 +127,20 @@ function Dashboard() {
     }
   }
 
+  const toggleTag = (tag) => {
+    setSelectedTags((current) =>
+      current.includes(tag) ? current.filter((value) => value !== tag) : [...current, tag]
+    )
+  }
+
+  const clearFilters = () => {
+    setSearchTerm('')
+    setSortOrder('latest')
+    setSelectedTags([])
+  }
+
   return (
-    <section className="dashboard-grid">
+    <section className="dashboard-shell">
       <div className="hero-panel">
         <p className="eyebrow">Your space</p>
         <h2>Dashboard</h2>
@@ -146,10 +155,81 @@ function Dashboard() {
         </div>
       </div>
 
+      <section className="stats-grid" aria-label="Notes statistics">
+        <article className="stat-card">
+          <p className="stat-card__label">Total notes</p>
+          <p className="stat-card__value">{totalNotesCount}</p>
+        </article>
+
+        <article className="stat-card">
+          <p className="stat-card__label">Pinned notes</p>
+          <p className="stat-card__value">{pinnedNotesCount}</p>
+        </article>
+
+        <article className="stat-card">
+          <p className="stat-card__label">Favorite notes</p>
+          <p className="stat-card__value">{favoriteNotesCount}</p>
+        </article>
+      </section>
+
+      <section className="dashboard-grid dashboard-grid--highlights">
+        <div className="panel">
+          <div className="panel-heading">
+            <h2>Recent notes</h2>
+            <span>{recentNotes.length} shown</span>
+          </div>
+
+          {recentNotes.length > 0 ? (
+            <div className="quick-note-list">
+              {recentNotes.map((note) => (
+                <NoteCard
+                  key={note.id}
+                  note={note}
+                  onDelete={handleDelete}
+                  onFavoriteToggle={handleFavoriteToggle}
+                  onPinToggle={handlePinToggle}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="empty-state">
+              <h3>No recent notes</h3>
+              <p>Create your first note to see activity here.</p>
+            </div>
+          )}
+        </div>
+
+        <div className="panel">
+          <div className="panel-heading">
+            <h2>Favorite notes</h2>
+            <span>{favoriteNotesCount} total</span>
+          </div>
+
+          {favoriteNotes.length > 0 ? (
+            <div className="quick-note-list">
+              {favoriteNotes.map((note) => (
+                <NoteCard
+                  key={note.id}
+                  note={note}
+                  onDelete={handleDelete}
+                  onFavoriteToggle={handleFavoriteToggle}
+                  onPinToggle={handlePinToggle}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="empty-state">
+              <h3>No favorites yet</h3>
+              <p>Mark notes with the star icon to keep your top ideas here.</p>
+            </div>
+          )}
+        </div>
+      </section>
+
       <div className="panel">
         <div className="panel-heading">
           <h2>Your notes</h2>
-          <span>{notes.length} saved</span>
+          <span>{notes.length} in view</span>
         </div>
 
         <div className="note-filters">
@@ -201,62 +281,13 @@ function Dashboard() {
             </div>
           ) : (
             notes.map((note) => (
-              <article key={note.id} className="note-card">
-                <div className="note-card__header">
-                  <div>
-                    <p className="note-meta">Updated {new Date(note.updatedAt).toLocaleString()}</p>
-                    <h3>{note.title}</h3>
-                  </div>
-                  <div className="note-status-actions">
-                    <button
-                      type="button"
-                      className={`icon-toggle ${note.favorite ? 'active' : ''}`}
-                      onClick={() => handleFavoriteToggle(note)}
-                      aria-label={note.favorite ? 'Remove favorite' : 'Mark as favorite'}
-                      title={note.favorite ? 'Favorite' : 'Mark as favorite'}
-                    >
-                      <StarIcon filled={note.favorite} />
-                    </button>
-                    <button
-                      type="button"
-                      className={`icon-toggle ${note.pinned ? 'active pinned' : ''}`}
-                      onClick={() => handlePinToggle(note)}
-                      aria-label={note.pinned ? 'Unpin note' : 'Pin note'}
-                      title={note.pinned ? 'Pinned to top' : 'Pin to top'}
-                    >
-                      <PinIcon />
-                    </button>
-                    <span className="note-badge">{note.pinned ? 'Pinned' : 'Snippet ready'}</span>
-                  </div>
-                </div>
-
-                <p>{note.content}</p>
-                {note.codeSnippet ? <pre>{note.codeSnippet}</pre> : null}
-
-                {note.tags && note.tags.length > 0 ? (
-                  <div className="note-tags">
-                    {note.tags.map((tag) => (
-                      <button
-                        key={`${note.id}-${tag}`}
-                        type="button"
-                        className={`tag-chip ${selectedTags.includes(tag) ? 'active' : ''}`}
-                        onClick={() => toggleTag(tag)}
-                      >
-                        #{tag}
-                      </button>
-                    ))}
-                  </div>
-                ) : null}
-
-                <div className="note-actions">
-                  <Link to={`/notes/${note.id}`} className="text-button">
-                    Edit
-                  </Link>
-                  <button type="button" className="text-button danger" onClick={() => handleDelete(note.id)}>
-                    Delete
-                  </button>
-                </div>
-              </article>
+              <NoteCard
+                key={note.id}
+                note={note}
+                onDelete={handleDelete}
+                onFavoriteToggle={handleFavoriteToggle}
+                onPinToggle={handlePinToggle}
+              />
             ))
           )}
         </div>

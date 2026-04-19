@@ -17,6 +17,8 @@ public interface NoteService {
 
     void deleteNote(Long noteId);
 
+    NoteResponse getNoteById(Long noteId);
+
     List<NoteResponse> getNotesByUser(String search, String sort, List<String> tags);
 }
 

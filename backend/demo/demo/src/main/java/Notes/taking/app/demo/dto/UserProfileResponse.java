@@ -11,12 +11,10 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class AuthResponseDto {
+public class UserProfileResponse {
 
-    private String token;
-    private String tokenType;
-    private String refreshToken;
-    private long accessTokenExpiresInMs;
-    private long refreshTokenExpiresInMs;
+    private Long id;
+    private String username;
+    private String email;
+    private long totalNotesCount;
 }
-

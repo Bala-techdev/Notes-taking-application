@@ -91,6 +91,17 @@ public class NoteServiceImpl implements NoteService {
 
     @Override
     @Transactional(readOnly = true)
+    public NoteResponse getNoteById(Long noteId) {
+        User user = getCurrentUser();
+
+        Note note = noteRepository.findByIdAndUserId(noteId, user.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Note not found with id: " + noteId));
+
+        return mapToResponse(note);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<NoteResponse> getNotesByUser(String search, String sort, List<String> tags) {
         User user = getCurrentUser();
 
@@ -177,6 +188,7 @@ public class NoteServiceImpl implements NoteService {
                 .pinned(Boolean.TRUE.equals(note.getPinned()))
                 .createdAt(note.getCreatedAt())
                 .updatedAt(note.getUpdatedAt())
+                .versionUpdatedAt(note.getVersionUpdatedAt())
                 .build();
     }
 }

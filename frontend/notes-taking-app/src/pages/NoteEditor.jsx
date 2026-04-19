@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import MonacoEditor from '@monaco-editor/react'
 import ReactMarkdown from 'react-markdown'
@@ -6,6 +6,7 @@ import remarkGfm from 'remark-gfm'
 
 import { createNote, getNotes, updateNote } from '../services/apiService'
 import LoadingSpinner from '../components/LoadingSpinner'
+import { formatDateTime, formatRelativeTime } from '../utils/time'
 
 const emptyNote = {
   title: '',
@@ -30,15 +31,28 @@ function NoteEditor() {
   const [codeLanguage, setCodeLanguage] = useState('javascript')
   const [viewMode, setViewMode] = useState('split')
   const [copyState, setCopyState] = useState('')
+  const [autoSaveStatus, setAutoSaveStatus] = useState('idle')
+  const [timeTick, setTimeTick] = useState(0)
   const [error, setError] = useState('')
   const [isSaving, setIsSaving] = useState(false)
   const [isLoading, setIsLoading] = useState(Boolean(id))
+  const hasPendingChangesRef = useRef(false)
+
+  useEffect(() => {
+    const intervalId = window.setInterval(() => {
+      setTimeTick((current) => current + 1)
+    }, 30000)
+
+    return () => window.clearInterval(intervalId)
+  }, [])
 
   useEffect(() => {
     const loadNote = async () => {
       if (!id) {
         setForm(emptyNote)
         setTagsInput('')
+        setAutoSaveStatus('idle')
+        hasPendingChangesRef.current = false
         setIsLoading(false)
         return
       }
@@ -60,8 +74,12 @@ function NoteEditor() {
           tags: existingNote.tags || [],
           favorite: Boolean(existingNote.favorite),
           pinned: Boolean(existingNote.pinned),
+          updatedAt: existingNote.updatedAt,
+          versionUpdatedAt: existingNote.versionUpdatedAt || existingNote.updatedAt,
         })
         setTagsInput((existingNote.tags || []).join(', '))
+        setAutoSaveStatus('saved')
+        hasPendingChangesRef.current = false
       } catch (error) {
         setError(error.message)
       } finally {
@@ -74,8 +92,67 @@ function NoteEditor() {
 
   const handleChange = (event) => {
     const { name, value } = event.target
+    hasPendingChangesRef.current = true
     setForm((current) => ({ ...current, [name]: value }))
   }
+
+  const buildPayload = () => {
+    const normalizedTags = tagsInput
+      .split(',')
+      .map((tag) => tag.trim().toLowerCase())
+      .filter(Boolean)
+
+    return {
+      title: form.title,
+      content: form.content,
+      codeSnippet: form.codeSnippet,
+      tags: [...new Set(normalizedTags)],
+      favorite: Boolean(form.favorite),
+      pinned: Boolean(form.pinned),
+    }
+  }
+
+  useEffect(() => {
+    if (!id || isLoading || isSaving || !hasPendingChangesRef.current) {
+      return
+    }
+
+    setAutoSaveStatus('saving')
+
+    const saveTimer = window.setTimeout(async () => {
+      try {
+        const updatedNote = await updateNote(id, buildPayload())
+        setForm((current) => ({
+          ...current,
+          updatedAt: updatedNote.updatedAt,
+          versionUpdatedAt: updatedNote.versionUpdatedAt || updatedNote.updatedAt,
+        }))
+        hasPendingChangesRef.current = false
+        setAutoSaveStatus('saved')
+      } catch {
+        setAutoSaveStatus('error')
+      }
+    }, 1200)
+
+    return () => window.clearTimeout(saveTimer)
+  }, [id, isLoading, isSaving, form.title, form.content, form.codeSnippet, form.favorite, form.pinned, tagsInput])
+
+  const lastEditedLabel = useMemo(() => {
+    if (!form.updatedAt) {
+      return 'Not saved yet'
+    }
+
+    return `${formatRelativeTime(form.updatedAt, timeTick)} (${formatDateTime(form.updatedAt)})`
+  }, [form.updatedAt, timeTick])
+
+  const versionEditedLabel = useMemo(() => {
+    const value = form.versionUpdatedAt || form.updatedAt
+    if (!value) {
+      return 'Not available'
+    }
+
+    return `${formatRelativeTime(value, timeTick)} (${formatDateTime(value)})`
+  }, [form.versionUpdatedAt, form.updatedAt, timeTick])
 
   const handleSubmit = async (event) => {
     event.preventDefault()
@@ -83,25 +160,14 @@ function NoteEditor() {
     setIsSaving(true)
 
     try {
-      const normalizedTags = tagsInput
-        .split(',')
-        .map((tag) => tag.trim().toLowerCase())
-        .filter(Boolean)
-
-      const payload = {
-        title: form.title,
-        content: form.content,
-        codeSnippet: form.codeSnippet,
-        tags: [...new Set(normalizedTags)],
-        favorite: Boolean(form.favorite),
-        pinned: Boolean(form.pinned),
-      }
+      const payload = buildPayload()
 
       if (id) {
         await updateNote(id, payload)
       } else {
         await createNote(payload)
       }
+      hasPendingChangesRef.current = false
       navigate('/dashboard')
     } catch (error) {
       setError(error.message)
@@ -131,6 +197,13 @@ function NoteEditor() {
         <div>
           <p className="eyebrow">Notes</p>
           <h1>{id ? 'Edit note' : 'Create note'}</h1>
+          <p className="note-meta">Last edited {lastEditedLabel}</p>
+          <p className="note-meta">Version updated {versionEditedLabel}</p>
+          {id ? (
+            <p className={`autosave-meta autosave-meta--${autoSaveStatus}`}>
+              {autoSaveStatus === 'saving' ? 'Auto-saving...' : autoSaveStatus === 'saved' ? 'Auto-saved' : autoSaveStatus === 'error' ? 'Auto-save failed. Continue editing or click Save note.' : 'Auto-save ready'}
+            </p>
+          ) : null}
         </div>
       </div>
 
@@ -156,7 +229,10 @@ function NoteEditor() {
             type="text"
             name="tags"
             value={tagsInput}
-            onChange={(event) => setTagsInput(event.target.value)}
+            onChange={(event) => {
+              hasPendingChangesRef.current = true
+              setTagsInput(event.target.value)
+            }}
             placeholder="Add tags separated by commas (example: java, backend, tutorial)"
             disabled={isLoading}
           />
@@ -167,7 +243,10 @@ function NoteEditor() {
             <input
               type="checkbox"
               checked={Boolean(form.favorite)}
-              onChange={(event) => setForm((current) => ({ ...current, favorite: event.target.checked }))}
+              onChange={(event) => {
+                hasPendingChangesRef.current = true
+                setForm((current) => ({ ...current, favorite: event.target.checked }))
+              }}
               disabled={isLoading}
             />
             Mark as favorite
@@ -177,7 +256,10 @@ function NoteEditor() {
             <input
               type="checkbox"
               checked={Boolean(form.pinned)}
-              onChange={(event) => setForm((current) => ({ ...current, pinned: event.target.checked }))}
+              onChange={(event) => {
+                hasPendingChangesRef.current = true
+                setForm((current) => ({ ...current, pinned: event.target.checked }))
+              }}
               disabled={isLoading}
             />
             Pin to top
@@ -262,7 +344,10 @@ function NoteEditor() {
             height="320px"
             language={codeLanguage}
             value={form.codeSnippet}
-            onChange={(value) => setForm((current) => ({ ...current, codeSnippet: value || '' }))}
+            onChange={(value) => {
+              hasPendingChangesRef.current = true
+              setForm((current) => ({ ...current, codeSnippet: value || '' }))
+            }}
             options={{
               minimap: { enabled: false },
               fontSize: 14,

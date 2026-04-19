@@ -1,49 +1,54 @@
 import { useEffect, useState } from 'react'
-import { NavLink, Outlet, useNavigate } from 'react-router-dom'
+import { NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 
 import { getCurrentUser, logout } from '../services/authService'
+import ThemeToggle from './ThemeToggle'
 
 function AppLayout() {
   const navigate = useNavigate()
-  const currentUser = getCurrentUser()
-  const [theme, setTheme] = useState(() => localStorage.getItem('notes-theme') || 'light')
+  const location = useLocation()
+  const [currentUser, setCurrentUser] = useState(() => getCurrentUser())
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme)
-    localStorage.setItem('notes-theme', theme)
-  }, [theme])
+    setCurrentUser(getCurrentUser())
+    setIsMobileMenuOpen(false)
+  }, [location.pathname])
 
   const handleLogout = () => {
     logout()
     navigate('/login')
   }
 
-  const toggleTheme = () => {
-    setTheme((current) => (current === 'dark' ? 'light' : 'dark'))
-  }
-
   return (
     <div className="workspace-shell">
-      <aside className="sidebar" aria-label="Sidebar navigation">
+      <aside className={`sidebar ${isMobileMenuOpen ? 'mobile-open' : ''}`} aria-label="Sidebar navigation">
         <div className="sidebar-top">
           <p className="logo-mark">NF</p>
           <div>
             <p className="eyebrow">Workspace</p>
             <h1 className="brand-title">NotesFlow</h1>
           </div>
+          <button
+            type="button"
+            className="menu-toggle"
+            onClick={() => setIsMobileMenuOpen((current) => !current)}
+            aria-label={isMobileMenuOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={isMobileMenuOpen}
+          >
+            {isMobileMenuOpen ? 'Close' : 'Menu'}
+          </button>
         </div>
 
-        <nav className="sidebar-nav">
-          <NavLink to="/dashboard">Dashboard</NavLink>
-          <NavLink to="/notes/new">New Note</NavLink>
-          <NavLink to="/profile">Profile</NavLink>
+        <nav className={`sidebar-nav ${isMobileMenuOpen ? 'open' : ''}`}>
+          <NavLink to="/dashboard" onClick={() => setIsMobileMenuOpen(false)}>Dashboard</NavLink>
+          <NavLink to="/notes/new" onClick={() => setIsMobileMenuOpen(false)}>New Note</NavLink>
+          <NavLink to="/profile" onClick={() => setIsMobileMenuOpen(false)}>Profile</NavLink>
         </nav>
 
-        <div className="sidebar-footer">
-          <button type="button" className="secondary-button" onClick={toggleTheme}>
-            {theme === 'dark' ? 'Switch to Light' : 'Switch to Dark'}
-          </button>
-          <p className="user-chip">{currentUser?.email ?? 'Guest'}</p>
+        <div className={`sidebar-footer ${isMobileMenuOpen ? 'open' : ''}`}>
+          <ThemeToggle className="secondary-button" />
+          <p className="user-chip">{currentUser?.username || currentUser?.email || 'Guest'}</p>
           <button type="button" className="text-button danger" onClick={handleLogout}>
             Logout
           </button>

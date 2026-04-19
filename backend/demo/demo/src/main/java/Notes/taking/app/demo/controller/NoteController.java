@@ -44,6 +44,11 @@ public class NoteController {
         return ResponseEntity.ok(noteService.getNotesByUser(search, sort, parsedTags));
     }
 
+    @GetMapping("/{noteId}")
+    public ResponseEntity<NoteResponse> getNoteById(@PathVariable Long noteId) {
+        return ResponseEntity.ok(noteService.getNoteById(noteId));
+    }
+
     @PutMapping("/{noteId}")
     public ResponseEntity<NoteResponse> updateNote(@PathVariable Long noteId,
                                                    @Valid @RequestBody NoteRequest request) {

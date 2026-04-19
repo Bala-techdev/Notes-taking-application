@@ -26,5 +26,6 @@ public class NoteResponse {
     private Boolean pinned;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private LocalDateTime versionUpdatedAt;
 }
 

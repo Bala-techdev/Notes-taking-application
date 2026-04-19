@@ -151,6 +151,15 @@ export async function getNotes(filters = {}) {
   }
 }
 
+export async function getNoteById(id) {
+  try {
+    const { data } = await apiClient.get(`/api/notes/${id}`)
+    return data
+  } catch (error) {
+    throwApiError(error, 'Failed to load note.')
+  }
+}
+
 export async function createNote(noteInput) {
   try {
     const { data } = await apiClient.post('/api/notes', noteInput)
@@ -192,6 +201,24 @@ export async function updateNotePinned(id, enabled) {
     return data
   } catch (error) {
     throwApiError(error, 'Failed to update pin status.')
+  }
+}
+
+export async function getMyProfile() {
+  try {
+    const { data } = await apiClient.get('/api/users/me')
+    return data
+  } catch (error) {
+    throwApiError(error, 'Failed to load profile.')
+  }
+}
+
+export async function updateMyProfile(profileInput) {
+  try {
+    const { data } = await apiClient.put('/api/users/me', profileInput)
+    return data
+  } catch (error) {
+    throwApiError(error, 'Failed to update profile.')
   }
 }
 
