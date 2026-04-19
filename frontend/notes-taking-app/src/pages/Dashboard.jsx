@@ -6,7 +6,7 @@ import { deleteNote, getNotes } from '../services/apiService'
 
 function Dashboard() {
   const navigate = useNavigate()
-  const currentUser = getCurrentUser()
+  const [currentUser] = useState(() => getCurrentUser())
   const [notes, setNotes] = useState([])
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(true)

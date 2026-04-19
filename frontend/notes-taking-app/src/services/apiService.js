@@ -29,9 +29,10 @@ apiClient.interceptors.request.use((config) => {
   const session = getCurrentUser()
   const token = session?.token
   const tokenType = session?.tokenType || 'Bearer'
+  const requestUrl = String(config.url || '')
 
   // ✅ Skip token for auth APIs
-  if (!config.url.startsWith('/api/auth/') && token) {
+  if (token && !requestUrl.includes('/api/auth/')) {
     config.headers.Authorization = `${tokenType} ${token}`
   }
 
