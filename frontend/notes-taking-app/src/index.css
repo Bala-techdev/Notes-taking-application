@@ -1,30 +1,39 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Crimson+Text:wght@600;700&family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
-  --page-bg: #f4f8ff;
-  --panel: rgba(255, 255, 255, 0.78);
-  --panel-strong: #ffffff;
-  --panel-border: rgba(33, 62, 99, 0.16);
-  --text: #25324a;
-  --text-strong: #0f1d33;
-  --muted: #5f6f89;
-  --accent: #0e8fdd;
-  --accent-2: #f97316;
-  --danger: #dc2626;
-  --ok: #0f9d58;
-  --shadow-soft: 0 22px 52px rgba(28, 56, 94, 0.12);
-  --shadow-strong: 0 28px 60px rgba(20, 42, 72, 0.2);
-  --radius-lg: 26px;
-  --radius-md: 16px;
-  --radius-sm: 12px;
+  --bg: #f7f8fb;
+  --surface: #ffffff;
+  --surface-soft: #f3f5f9;
+  --border: #e2e8f0;
+  --border-strong: #cbd5e1;
+  --text: #334155;
+  --text-strong: #0f172a;
+  --muted: #64748b;
+  --brand: #2563eb;
+  --shadow-soft: 0 10px 25px rgba(15, 23, 42, 0.05);
+  --shadow-strong: 0 18px 34px rgba(15, 23, 42, 0.12);
   color: var(--text);
-  font-family: 'Outfit', 'Segoe UI', sans-serif;
-  font-size: clamp(15px, 0.35vw + 14px, 18px);
-  line-height: 1.5;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  font-size: 16px;
+  line-height: 1.55;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+:root[data-theme='dark'] {
+  --bg: #0b1220;
+  --surface: #111a2b;
+  --surface-soft: #162238;
+  --border: #22314c;
+  --border-strong: #334769;
+  --text: #c7d2e1;
+  --text-strong: #e2e8f0;
+  --muted: #94a3b8;
+  --brand: #60a5fa;
+  --shadow-soft: 0 12px 30px rgba(2, 6, 23, 0.38);
+  --shadow-strong: 0 20px 40px rgba(2, 6, 23, 0.5);
 }
 
 * {
@@ -39,10 +48,9 @@ html {
 body {
   margin: 0;
   min-height: 100vh;
-  background:
-    radial-gradient(circle at 12% -2%, rgba(14, 143, 221, 0.24), transparent 40%),
-    radial-gradient(circle at 92% 2%, rgba(249, 115, 22, 0.2), transparent 42%),
-    linear-gradient(180deg, #f8fbff 0%, #edf5ff 100%);
+  background: var(--bg);
+  color: var(--text);
+  transition: background 0.25s ease, color 0.25s ease;
 }
 
 a {

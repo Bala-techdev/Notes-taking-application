@@ -128,9 +128,23 @@ export async function register({ username, email, password }) {
   }
 }
 
-export async function getNotes() {
+export async function getNotes(filters = {}) {
   try {
-    const { data } = await apiClient.get('/api/notes')
+    const params = {}
+
+    if (filters.search && filters.search.trim()) {
+      params.search = filters.search.trim()
+    }
+
+    if (filters.sort && (filters.sort === 'latest' || filters.sort === 'oldest')) {
+      params.sort = filters.sort
+    }
+
+    if (Array.isArray(filters.tags) && filters.tags.length > 0) {
+      params.tags = filters.tags.join(',')
+    }
+
+    const { data } = await apiClient.get('/api/notes', { params })
     return data
   } catch (error) {
     throwApiError(error, 'Failed to fetch notes.')
@@ -160,6 +174,24 @@ export async function deleteNote(id) {
     await apiClient.delete(`/api/notes/${id}`)
   } catch (error) {
     throwApiError(error, 'Failed to delete note.')
+  }
+}
+
+export async function updateNoteFavorite(id, enabled) {
+  try {
+    const { data } = await apiClient.patch(`/api/notes/${id}/favorite`, { enabled })
+    return data
+  } catch (error) {
+    throwApiError(error, 'Failed to update favorite status.')
+  }
+}
+
+export async function updateNotePinned(id, enabled) {
+  try {
+    const { data } = await apiClient.patch(`/api/notes/${id}/pin`, { enabled })
+    return data
+  } catch (error) {
+    throwApiError(error, 'Failed to update pin status.')
   }
 }
 

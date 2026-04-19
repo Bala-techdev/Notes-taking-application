@@ -1,6 +1,7 @@
 package notes.taking.app.demo.dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,6 +21,9 @@ public class NoteResponse {
     private String title;
     private String content;
     private String codeSnippet;
+    private List<String> tags;
+    private Boolean favorite;
+    private Boolean pinned;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

@@ -1,5 +1,7 @@
 package notes.taking.app.demo.dto;
 
+import java.util.List;
+
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -25,5 +27,11 @@ public class NoteRequest {
 
     @Size(max = 50000, message = "Code snippet must not exceed 50000 characters")
     private String codeSnippet;
+
+    private List<@Size(max = 40, message = "Each tag must not exceed 40 characters") String> tags;
+
+    private Boolean favorite;
+
+    private Boolean pinned;
 }
 

@@ -11,8 +11,12 @@ public interface NoteService {
 
     NoteResponse updateNote(Long noteId, NoteRequest request);
 
+    NoteResponse updateFavorite(Long noteId, boolean enabled);
+
+    NoteResponse updatePinned(Long noteId, boolean enabled);
+
     void deleteNote(Long noteId);
 
-    List<NoteResponse> getNotesByUser();
+    List<NoteResponse> getNotesByUser(String search, String sort, List<String> tags);
 }
 

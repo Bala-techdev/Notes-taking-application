@@ -1,34 +1,56 @@
-import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { NavLink, Outlet, useNavigate } from 'react-router-dom'
 
 import { getCurrentUser, logout } from '../services/authService'
 
 function AppLayout() {
   const navigate = useNavigate()
   const currentUser = getCurrentUser()
+  const [theme, setTheme] = useState(() => localStorage.getItem('notes-theme') || 'light')
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme)
+    localStorage.setItem('notes-theme', theme)
+  }, [theme])
 
   const handleLogout = () => {
     logout()
     navigate('/login')
   }
 
-  return (
-    <div className="app-shell">
-      <header className="topbar">
-        <Link to="/dashboard" className="brand">
-          NotesFlow
-        </Link>
+  const toggleTheme = () => {
+    setTheme((current) => (current === 'dark' ? 'light' : 'dark'))
+  }
 
-        <nav className="nav-links" aria-label="Primary navigation">
+  return (
+    <div className="workspace-shell">
+      <aside className="sidebar" aria-label="Sidebar navigation">
+        <div className="sidebar-top">
+          <p className="logo-mark">NF</p>
+          <div>
+            <p className="eyebrow">Workspace</p>
+            <h1 className="brand-title">NotesFlow</h1>
+          </div>
+        </div>
+
+        <nav className="sidebar-nav">
           <NavLink to="/dashboard">Dashboard</NavLink>
           <NavLink to="/notes/new">New Note</NavLink>
-          <span className="user-chip">{currentUser?.email ?? 'Guest'}</span>
-          <button type="button" className="text-button" onClick={handleLogout}>
+          <NavLink to="/profile">Profile</NavLink>
+        </nav>
+
+        <div className="sidebar-footer">
+          <button type="button" className="secondary-button" onClick={toggleTheme}>
+            {theme === 'dark' ? 'Switch to Light' : 'Switch to Dark'}
+          </button>
+          <p className="user-chip">{currentUser?.email ?? 'Guest'}</p>
+          <button type="button" className="text-button danger" onClick={handleLogout}>
             Logout
           </button>
-        </nav>
-      </header>
+        </div>
+      </aside>
 
-      <main className="page-wrap">
+      <main className="content-shell">
         <Outlet />
       </main>
     </div>
