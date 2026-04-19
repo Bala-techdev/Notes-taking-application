@@ -1,9 +1,9 @@
-package Notes.taking.app.demo.service;
+package notes.taking.app.demo.service;
 
 import java.util.List;
 
-import Notes.taking.app.demo.dto.NoteRequest;
-import Notes.taking.app.demo.dto.NoteResponse;
+import notes.taking.app.demo.dto.NoteRequest;
+import notes.taking.app.demo.dto.NoteResponse;
 
 public interface NoteService {
 
@@ -15,3 +15,4 @@ public interface NoteService {
 
     List<NoteResponse> getNotesByUser();
 }
+

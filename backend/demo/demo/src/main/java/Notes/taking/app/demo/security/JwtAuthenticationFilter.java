@@ -1,4 +1,4 @@
-package Notes.taking.app.demo.security;
+package notes.taking.app.demo.security;
 
 import java.io.IOException;
 
@@ -68,3 +68,4 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 }
+

@@ -1,4 +1,4 @@
-package Notes.taking.app.demo.dto;
+package notes.taking.app.demo.dto;
 
 import java.time.LocalDateTime;
 
@@ -23,3 +23,4 @@ public class NoteResponse {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }
+

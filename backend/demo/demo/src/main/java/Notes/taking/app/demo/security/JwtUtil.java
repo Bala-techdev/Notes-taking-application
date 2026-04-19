@@ -1,4 +1,4 @@
-package Notes.taking.app.demo.security;
+package notes.taking.app.demo.security;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
@@ -86,3 +86,4 @@ public class JwtUtil {
         return value != null && value.matches("^[A-Za-z0-9+/=\\s]+$");
     }
 }
+

@@ -1,15 +1,15 @@
-package Notes.taking.app.demo.service;
+package notes.taking.app.demo.service;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import Notes.taking.app.demo.dto.UserRequest;
-import Notes.taking.app.demo.dto.UserResponse;
-import Notes.taking.app.demo.entity.User;
-import Notes.taking.app.demo.exception.DuplicateResourceException;
-import Notes.taking.app.demo.exception.ResourceNotFoundException;
-import Notes.taking.app.demo.repository.UserRepository;
+import notes.taking.app.demo.dto.UserRequest;
+import notes.taking.app.demo.dto.UserResponse;
+import notes.taking.app.demo.entity.User;
+import notes.taking.app.demo.exception.DuplicateResourceException;
+import notes.taking.app.demo.exception.ResourceNotFoundException;
+import notes.taking.app.demo.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -61,3 +61,4 @@ public class UserServiceImpl implements UserService {
                 .build();
     }
 }
+

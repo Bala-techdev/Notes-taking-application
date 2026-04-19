@@ -1,4 +1,4 @@
-package Notes.taking.app.demo.exception;
+package notes.taking.app.demo.exception;
 
 import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
@@ -66,3 +66,4 @@ public class GlobalExceptionHandler {
                                 Map<String, String> fieldErrors) {
     }
 }
+

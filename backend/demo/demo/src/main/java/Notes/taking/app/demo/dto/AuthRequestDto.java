@@ -1,4 +1,4 @@
-package Notes.taking.app.demo.dto;
+package notes.taking.app.demo.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -24,3 +24,4 @@ public class AuthRequestDto {
 
     private String username;
 }
+

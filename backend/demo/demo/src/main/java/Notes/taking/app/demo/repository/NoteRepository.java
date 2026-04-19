@@ -1,4 +1,4 @@
-package Notes.taking.app.demo.repository;
+package notes.taking.app.demo.repository;
 
 import java.util.List;
 import java.util.Optional;
@@ -6,7 +6,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import Notes.taking.app.demo.entity.Note;
+import notes.taking.app.demo.entity.Note;
 
 @Repository
 public interface NoteRepository extends JpaRepository<Note, Long> {
@@ -15,3 +15,4 @@ public interface NoteRepository extends JpaRepository<Note, Long> {
 
 	Optional<Note> findByIdAndUserId(Long id, Long userId);
 }
+

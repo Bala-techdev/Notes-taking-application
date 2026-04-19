@@ -1,4 +1,4 @@
-package Notes.taking.app.demo.dto;
+package notes.taking.app.demo.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,3 +17,4 @@ public class UserResponse {
     private String username;
     private String email;
 }
+

@@ -1,4 +1,4 @@
-package Notes.taking.app.demo.dto;
+package notes.taking.app.demo.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,3 +16,4 @@ public class AuthResponseDto {
     private String token;
     private String tokenType;
 }
+

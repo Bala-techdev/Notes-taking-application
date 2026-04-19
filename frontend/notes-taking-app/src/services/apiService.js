@@ -1,8 +1,9 @@
 import axios from 'axios'
 import { clearSession, getCurrentUser, saveSession } from './authService'
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || (import.meta.env.DEV ? '' : 'http://localhost:8080')
+// const API_BASE_URL =
+//   import.meta.env.VITE_API_BASE_URL || (import.meta.env.DEV ? '' : 'http://localhost:8080')
+const API_BASE_URL = "http://localhost:8080"
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -13,18 +14,29 @@ const apiClient = axios.create({
   },
 })
 
+// apiClient.interceptors.request.use((config) => {
+//   const session = getCurrentUser()
+//   const token = session?.token
+//   const tokenType = session?.tokenType || 'Bearer'
+
+//   if (token) {
+//     config.headers.Authorization = `${tokenType} ${token}`
+//   }
+
+//   return config
+// })
 apiClient.interceptors.request.use((config) => {
   const session = getCurrentUser()
   const token = session?.token
   const tokenType = session?.tokenType || 'Bearer'
 
-  if (token) {
+  // ✅ Skip token for auth APIs
+  if (!config.url.startsWith('/api/auth/') && token) {
     config.headers.Authorization = `${tokenType} ${token}`
   }
 
   return config
 })
-
 apiClient.interceptors.response.use(
   (response) => response,
   (error) => {

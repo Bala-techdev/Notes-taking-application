@@ -1,4 +1,4 @@
-package Notes.taking.app.demo.security;
+package notes.taking.app.demo.security;
 
 import java.util.Collection;
 import java.util.List;
@@ -7,7 +7,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import Notes.taking.app.demo.entity.User;
+import notes.taking.app.demo.entity.User;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -50,3 +50,4 @@ public class CustomUserPrincipal implements UserDetails {
         return true;
     }
 }
+

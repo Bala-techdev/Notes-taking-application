@@ -1,4 +1,4 @@
-package Notes.taking.app.demo.dto;
+package notes.taking.app.demo.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -22,3 +22,4 @@ public class LoginRequestDto {
     @NotBlank(message = "Password is required")
     private String password;
 }
+

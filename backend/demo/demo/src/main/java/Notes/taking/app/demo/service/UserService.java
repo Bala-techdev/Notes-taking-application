@@ -1,7 +1,7 @@
-package Notes.taking.app.demo.service;
+package notes.taking.app.demo.service;
 
-import Notes.taking.app.demo.dto.UserRequest;
-import Notes.taking.app.demo.dto.UserResponse;
+import notes.taking.app.demo.dto.UserRequest;
+import notes.taking.app.demo.dto.UserResponse;
 
 public interface UserService {
 
@@ -9,3 +9,4 @@ public interface UserService {
 
     UserResponse findUserByEmail(String email);
 }
+

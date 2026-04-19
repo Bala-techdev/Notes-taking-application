@@ -1,4 +1,4 @@
-package Notes.taking.app.demo.security;
+package notes.taking.app.demo.security;
 
 import java.util.List;
 
@@ -33,8 +33,8 @@ public class SecurityConfig {
     @Value("${app.cors.allowed-origins}")
     private List<String> allowedOrigins;
 
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    private final CustomUserDetailsService customUserDetailsService;
+    private final notes.taking.app.demo.security.JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final notes.taking.app.demo.security.CustomUserDetailsService customUserDetailsService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -88,3 +88,4 @@ public class SecurityConfig {
         return authenticationConfiguration.getAuthenticationManager();
     }
 }
+

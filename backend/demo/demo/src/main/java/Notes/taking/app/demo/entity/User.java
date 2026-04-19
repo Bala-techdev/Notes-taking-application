@@ -1,4 +1,4 @@
-package Notes.taking.app.demo.entity;
+package notes.taking.app.demo.entity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,3 +52,4 @@ public class User {
     @Builder.Default
     private List<Note> notes = new ArrayList<>();
 }
+

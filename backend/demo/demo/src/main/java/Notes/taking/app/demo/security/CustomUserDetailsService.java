@@ -1,11 +1,11 @@
-package Notes.taking.app.demo.security;
+package notes.taking.app.demo.security;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import Notes.taking.app.demo.repository.UserRepository;
+import notes.taking.app.demo.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -21,3 +21,4 @@ public class CustomUserDetailsService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
     }
 }
+

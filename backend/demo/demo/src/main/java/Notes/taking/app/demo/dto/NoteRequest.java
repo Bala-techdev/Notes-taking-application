@@ -1,4 +1,4 @@
-package Notes.taking.app.demo.dto;
+package notes.taking.app.demo.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -26,3 +26,4 @@ public class NoteRequest {
     @Size(max = 50000, message = "Code snippet must not exceed 50000 characters")
     private String codeSnippet;
 }
+

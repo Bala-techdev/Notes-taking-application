@@ -1,4 +1,4 @@
-package Notes.taking.app.demo.service;
+package notes.taking.app.demo.service;
 
 import java.util.List;
 
@@ -8,13 +8,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import Notes.taking.app.demo.dto.NoteRequest;
-import Notes.taking.app.demo.dto.NoteResponse;
-import Notes.taking.app.demo.entity.Note;
-import Notes.taking.app.demo.entity.User;
-import Notes.taking.app.demo.exception.ResourceNotFoundException;
-import Notes.taking.app.demo.repository.NoteRepository;
-import Notes.taking.app.demo.repository.UserRepository;
+import notes.taking.app.demo.dto.NoteRequest;
+import notes.taking.app.demo.dto.NoteResponse;
+import notes.taking.app.demo.entity.Note;
+import notes.taking.app.demo.entity.User;
+import notes.taking.app.demo.exception.ResourceNotFoundException;
+import notes.taking.app.demo.repository.NoteRepository;
+import notes.taking.app.demo.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -103,3 +103,4 @@ public class NoteServiceImpl implements NoteService {
                 .build();
     }
 }
+

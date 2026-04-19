@@ -1,4 +1,4 @@
-package Notes.taking.app.demo.entity;
+package notes.taking.app.demo.entity;
 
 import java.time.LocalDateTime;
 
@@ -74,3 +74,4 @@ public class Note {
         this.updatedAt = LocalDateTime.now();
     }
 }
+

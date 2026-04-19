@@ -1,4 +1,4 @@
-package Notes.taking.app.demo.exception;
+package notes.taking.app.demo.exception;
 
 public class ResourceNotFoundException extends RuntimeException {
 
@@ -6,3 +6,4 @@ public class ResourceNotFoundException extends RuntimeException {
         super(message);
     }
 }
+

@@ -1,23 +1,17 @@
-package Notes.taking.app.demo.controller;
+package notes.taking.app.demo.controller;
 
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import Notes.taking.app.demo.dto.NoteRequest;
-import Notes.taking.app.demo.dto.NoteResponse;
-import Notes.taking.app.demo.service.NoteService;
+import notes.taking.app.demo.dto.NoteRequest;
+import notes.taking.app.demo.dto.NoteResponse;
+import notes.taking.app.demo.service.NoteService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
 
 @RestController
 @RequestMapping("/api/notes")
@@ -48,3 +42,4 @@ public class NoteController {
         return ResponseEntity.noContent().build();
     }
 }
+
