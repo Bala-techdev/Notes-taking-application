@@ -4,6 +4,7 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 
 import LoadingSpinner from '../components/LoadingSpinner'
+import CodeRunner from '../components/CodeRunner'
 import { deleteNote, getNoteById } from '../services/apiService'
 import { formatDateTime, formatRelativeTime } from '../utils/time'
 
@@ -132,6 +133,7 @@ function NoteView() {
                 <pre>
                   <code>{note.codeSnippet}</code>
                 </pre>
+                <CodeRunner codeSnippet={note.codeSnippet} initialLanguage="python" />
               </section>
             ) : null}
           </section>
