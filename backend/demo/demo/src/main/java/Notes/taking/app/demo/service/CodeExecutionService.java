@@ -1,10 +1,17 @@
 package Notes.taking.app.demo.service;
 
 import Notes.taking.app.demo.dto.*;
+import java.util.Collections;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.HttpClientErrorException;
 
 @Service
 @Slf4j
@@ -12,13 +19,22 @@ public class CodeExecutionService {
     
     private static final String PISTON_API_URL = "https://emkc.org/api/v2/piston/execute";
     private final RestTemplate restTemplate;
+    private final String pistonApiToken;
     
-    public CodeExecutionService(RestTemplate restTemplate) {
+    public CodeExecutionService(RestTemplate restTemplate,
+                                @Value("${app.piston.api-token:}") String pistonApiToken) {
         this.restTemplate = restTemplate;
+        this.pistonApiToken = pistonApiToken;
     }
     
     public CodeExecutionResponse executeCode(CodeExecutionRequest request) {
         try {
+            if (pistonApiToken == null || pistonApiToken.trim().isEmpty()) {
+                throw new IllegalStateException(
+                    "Piston API token is not configured. Set app.piston.api-token or PISTON_API_TOKEN."
+                );
+            }
+
             // Validate input
             request.validate();
             
@@ -26,15 +42,28 @@ public class CodeExecutionService {
             PistonApiRequest pistonRequest = buildPistonRequest(request);
             
             // Call Piston API
-            PistonApiResponse pistonResponse = restTemplate.postForObject(
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+            headers.setBearerAuth(pistonApiToken.trim());
+
+            HttpEntity<PistonApiRequest> entity = new HttpEntity<>(pistonRequest, headers);
+            PistonApiResponse pistonResponse = restTemplate.exchange(
                 PISTON_API_URL,
-                pistonRequest,
+                HttpMethod.POST,
+                entity,
                 PistonApiResponse.class
-            );
+            ).getBody();
             
             // Map response to our DTO
             return mapPistonResponse(pistonResponse);
             
+        } catch (HttpClientErrorException.Unauthorized e) {
+            log.error("Piston API rejected the request with 401 Unauthorized", e);
+            CodeExecutionResponse response = new CodeExecutionResponse();
+            response.setError("Piston API rejected the request with 401 Unauthorized. Check your Piston token.");
+            response.setExitCode(-1);
+            return response;
         } catch (IllegalArgumentException e) {
             log.warn("Validation error: {}", e.getMessage());
             CodeExecutionResponse response = new CodeExecutionResponse();

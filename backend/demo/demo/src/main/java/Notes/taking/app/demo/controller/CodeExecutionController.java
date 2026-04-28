@@ -2,7 +2,7 @@ package Notes.taking.app.demo.controller;
 
 import Notes.taking.app.demo.dto.CodeExecutionRequest;
 import Notes.taking.app.demo.dto.CodeExecutionResponse;
-import Notes.taking.app.demo.service.CodeExecutionService;
+import Notes.taking.app.demo.service.LocalAwareCodeExecutionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,9 +12,9 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 public class CodeExecutionController {
     
-    private final CodeExecutionService codeExecutionService;
+    private final LocalAwareCodeExecutionService codeExecutionService;
     
-    public CodeExecutionController(CodeExecutionService codeExecutionService) {
+    public CodeExecutionController(LocalAwareCodeExecutionService codeExecutionService) {
         this.codeExecutionService = codeExecutionService;
     }
     

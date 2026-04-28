@@ -1,4 +1,5 @@
 import axios from 'axios'
+import { getCurrentUser, getAuthToken } from './authService'
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api'
 
@@ -9,9 +10,12 @@ const axiosInstance = axios.create({
 // Add JWT token to requests
 axiosInstance.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('authToken')
+    const session = getCurrentUser()
+    const token = getAuthToken() || session?.token
+    const tokenType = session?.tokenType || 'Bearer'
+
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`
+      config.headers.Authorization = `${tokenType} ${token}`
     }
     return config
   },
